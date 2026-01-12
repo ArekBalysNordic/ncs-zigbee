@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software maturity &mdash; Zigbee R23 add-on for nRF Connect SDK 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script src="_static/tabs.js"></script>
+    <script src="_static/js/theme.js"></script>
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release notes" href="release-notes.html" />
+    <link rel="prev" title="Tools" href="tools.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Zigbee R23 add-on for nRF Connect SDK
+          </a>
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee R23 add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Software maturity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#zigbee-feature-support">Zigbee feature support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="known_issues.html">Known issues</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Zigbee R23 add-on for nRF Connect SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Software maturity</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/software-maturity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="software-maturity">
+<span id="id1"></span><h1>Software maturity<a class="headerlink" href="#software-maturity" title="Permalink to this headline"></a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#zigbee-feature-support" id="id3">Zigbee feature support</a></p></li>
+</ul>
+</div>
+<p>For the supported devices see the <a class="reference internal" href="setup.html#zigbee-setup"><span class="std std-ref">Hardware requirements</span></a> section.</p>
+<section id="zigbee-feature-support">
+<h2><a class="toc-backref" href="#id3">Zigbee feature support</a><a class="headerlink" href="#zigbee-feature-support" title="Permalink to this headline"></a></h2>
+<p>The following table indicates the software maturity levels of the support for each Zigbee feature:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-blJGNTIgU2VyaWVz" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-blJGNTIgU2VyaWVz" name="blJGNTIgU2VyaWVz" role="tab" tabindex="0">nRF52 Series</button><button aria-controls="panel-0-blJGNTMgU2VyaWVz" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-blJGNTMgU2VyaWVz" name="blJGNTMgU2VyaWVz" role="tab" tabindex="-1">nRF53 Series</button><button aria-controls="panel-0-blJGNTQgU2VyaWVz" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-blJGNTQgU2VyaWVz" name="blJGNTQgU2VyaWVz" role="tab" tabindex="-1">nRF54 Series</button><button aria-controls="panel-0-blJGOTEgU2VyaWVz" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-blJGOTEgU2VyaWVz" name="blJGOTEgU2VyaWVz" role="tab" tabindex="-1">nRF91 Series</button></div><div aria-labelledby="tab-0-blJGNTIgU2VyaWVz" class="sphinx-tabs-panel group-tab" id="panel-0-blJGNTIgU2VyaWVz" name="blJGNTIgU2VyaWVz" role="tabpanel" tabindex="0"><table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>nRF52810</p></th>
+<th class="head"><p>nRF52811</p></th>
+<th class="head"><p>nRF52820</p></th>
+<th class="head"><p>nRF52832</p></th>
+<th class="head"><p>nRF52833</p></th>
+<th class="head"><p>nRF52840</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>OTA DFU over Zigbee</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee (Sleepy) End Device</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee + Bluetooth LE multiprotocol</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee + nRF21540 (GPIO)</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Coordinator</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee Network Co-Processor (NCP)</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Router</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+</tr>
+</tbody>
+</table>
+</div><div aria-labelledby="tab-0-blJGNTMgU2VyaWVz" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-blJGNTMgU2VyaWVz" name="blJGNTMgU2VyaWVz" role="tabpanel" tabindex="0"><table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>nRF5340</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>OTA DFU over Zigbee</strong></p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee (Sleepy) End Device</strong></p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee + Bluetooth LE multiprotocol</strong></p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee + nRF21540 (GPIO)</strong></p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Coordinator</strong></p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee Network Co-Processor (NCP)</strong></p></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Router</strong></p></td>
+<td><p>Supported</p></td>
+</tr>
+</tbody>
+</table>
+</div><div aria-labelledby="tab-0-blJGNTQgU2VyaWVz" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-blJGNTQgU2VyaWVz" name="blJGNTQgU2VyaWVz" role="tabpanel" tabindex="0"><table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>nRF54H20</p></th>
+<th class="head"><p>nRF54L05</p></th>
+<th class="head"><p>nRF54L10</p></th>
+<th class="head"><p>nRF54L15</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>OTA DFU over Zigbee</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee (Sleepy) End Device</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee + Bluetooth LE multiprotocol</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee + nRF21540 (GPIO)</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Coordinator</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee Network Co-Processor (NCP)</strong></p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Router</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>Supported</p></td>
+<td><p>Supported</p></td>
+</tr>
+</tbody>
+</table>
+</div><div aria-labelledby="tab-0-blJGOTEgU2VyaWVz" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-blJGOTEgU2VyaWVz" name="blJGOTEgU2VyaWVz" role="tabpanel" tabindex="0"><table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>nRF9131</p></th>
+<th class="head"><p>nRF9151</p></th>
+<th class="head"><p>nRF9160</p></th>
+<th class="head"><p>nRF9161</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>OTA DFU over Zigbee</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee (Sleepy) End Device</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee + Bluetooth LE multiprotocol</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee + nRF21540 (GPIO)</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Coordinator</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zigbee Network Co-Processor (NCP)</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Zigbee Router</strong></p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="release-notes.html" class="btn btn-neutral float-right" title="Release notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tools.html" class="btn btn-neutral" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2025, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
