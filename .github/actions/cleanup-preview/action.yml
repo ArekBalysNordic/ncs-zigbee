@@ -1,0 +1,46 @@
+name: 'Cleanup Documentation Preview'
+description: 'Removes PR preview directory from gh-pages branch'
+
+inputs:
+  pr_number:
+    description: 'Pull request number'
+    required: true
+  merged:
+    description: 'Whether the PR was merged (true) or just closed (false)'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Remove PR preview directory
+      shell: bash
+      run: |
+        pr_number="${{ inputs.pr_number }}"
+        merged="${{ inputs.merged }}"
+        preview_dir="pr-preview/pr-${pr_number}"
+
+        if [ "$merged" = "true" ]; then
+          echo "PR #${pr_number} was merged"
+        else
+          echo "PR #${pr_number} was closed without merging"
+        fi
+
+        if [ -d "$preview_dir" ]; then
+          echo "Removing preview directory: $preview_dir"
+          rm -rf "$preview_dir"
+
+          # Check if pr-preview directory is empty and remove if so
+          if [ -d "pr-preview" ] && [ -z "$(ls -A pr-preview)" ]; then
+            rm -rf "pr-preview"
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Clean up documentation preview for PR #${pr_number}" || echo "Nothing to commit"
+          git push origin gh-pages
+          echo "Preview cleaned up successfully"
+        else
+          echo "No preview directory found for PR #${pr_number}"
+        fi

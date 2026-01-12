@@ -10,6 +10,9 @@ __pycache__/
 # build
 /build*
 /twister-out*
+/samples/*/build*
 
 # docs
 /docs/_build*
+/docs/_build_sphinx*
+/docs/venv

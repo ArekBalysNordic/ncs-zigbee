@@ -1,0 +1,35 @@
+name: 'Get Changed Documentation Files'
+description: 'Detects changed .rst and .md files in the docs/ directory'
+
+inputs:
+  base_sha:
+    description: 'Base commit SHA to compare against'
+    required: true
+  head_sha:
+    description: 'Head commit SHA to compare to'
+    required: true
+
+outputs:
+  docs_files:
+    description: 'JSON array of changed documentation files'
+    value: ${{ steps.detect-changes.outputs.docs_files }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Detect changed documentation files
+      id: detect-changes
+      shell: bash
+      run: |
+        # Get list of changed .rst and .md files in docs/
+        changed_files=$(git diff --name-only ${{ inputs.base_sha }} ${{ inputs.head_sha }} -- 'docs/*.rst' 'docs/*.md' 'docs/**/*.rst' 'docs/**/*.md' | head -20)
+        echo "Changed documentation files:"
+        echo "$changed_files"
+
+        # Convert to JSON array for the comment
+        if [ -n "$changed_files" ]; then
+          docs_json=$(echo "$changed_files" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+        else
+          docs_json="[]"
+        fi
+        echo "docs_files=$docs_json" >> $GITHUB_OUTPUT

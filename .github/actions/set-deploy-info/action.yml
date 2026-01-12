@@ -1,0 +1,52 @@
+name: 'Set Deploy Info'
+description: 'Generates preview URL and deployment metadata'
+
+inputs:
+  repo_owner:
+    description: 'Repository owner (username or organization)'
+    required: true
+  repo_name:
+    description: 'Repository name'
+    required: true
+  pr_number:
+    description: 'Pull request number'
+    required: true
+  commit_sha:
+    description: 'Full commit SHA'
+    required: true
+
+outputs:
+  preview_url:
+    description: 'GitHub Pages preview URL'
+    value: ${{ steps.generate-info.outputs.preview_url }}
+  build_timestamp:
+    description: 'Build timestamp in UTC'
+    value: ${{ steps.generate-info.outputs.build_timestamp }}
+  commit_sha_short:
+    description: 'Shortened commit SHA (7 characters)'
+    value: ${{ steps.generate-info.outputs.commit_sha }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate deployment info
+      id: generate-info
+      shell: bash
+      run: |
+        # Construct the GitHub Pages URL
+        repo_owner="${{ inputs.repo_owner }}"
+        repo_name="${{ inputs.repo_name }}"
+        pr_number="${{ inputs.pr_number }}"
+        preview_url="https://${repo_owner}.github.io/${repo_name}/pr-preview/pr-${pr_number}"
+
+        # Get build timestamp in UTC
+        build_timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        commit_sha="${{ inputs.commit_sha }}"
+
+        echo "preview_url=$preview_url" >> $GITHUB_OUTPUT
+        echo "build_timestamp=$build_timestamp" >> $GITHUB_OUTPUT
+        echo "commit_sha=${commit_sha:0:7}" >> $GITHUB_OUTPUT
+
+        echo "Preview URL: $preview_url"
+        echo "Build timestamp: $build_timestamp"
+        echo "Commit: ${commit_sha:0:7}"

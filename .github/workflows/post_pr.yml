@@ -1,0 +1,27 @@
+# Workflow to clean up documentation previews when PR is merged or closed
+name: Post PR actions
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  # Clean up documentation preview when PR is merged or closed
+  cleanup_preview:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Remove PR preview directory
+        uses: ./.github/actions/cleanup-preview
+        with:
+          pr_number: ${{ github.event.pull_request.number }}
+          merged: ${{ github.event.pull_request.merged }}
