@@ -18,7 +18,9 @@ jobs:
         # Bash shell is needed to set toolchain related environment variables in docker container
         # It is a workaround for GitHub Actions limitation https://github.com/actions/runner/issues/1964
         shell: bash
-    steps: 
+    steps:
+    - name: Record start time
+      run: echo "BUILD_START_TIME=$(date +%s)" >> $GITHUB_ENV 
     - name: Checkout repository code
       uses: actions/checkout@v4
       with:
@@ -39,3 +41,12 @@ jobs:
       with:
         name: hexes
         path: twister-out/**/*.hex
+
+    - name: Print workflow duration
+      if: always()
+      run: |
+        END_TIME=$(date +%s)
+        DURATION=$((END_TIME - BUILD_START_TIME))
+        MINUTES=$((DURATION / 60))
+        SECONDS=$((DURATION % 60))
+        echo "::notice::Workflow completed in ${MINUTES}m ${SECONDS}s (${DURATION} seconds total)"
