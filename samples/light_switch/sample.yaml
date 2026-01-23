@@ -124,3 +124,23 @@ tests:
       - smoke
       - sysbuild
       - ci_samples_zigbee
+  sample.zigbee.light_switch.low_power_dut:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - light_switch_SNIPPET="low_power"
+      - CONFIG_LIGHT_SWITCH_TX_POWER=5
+    integration_platforms:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    platform_allow:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+  sample.zigbee.light_switch.low_power_max:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - light_switch_SNIPPET="low_power"
+      - CONFIG_LIGHT_SWITCH_TX_POWER=8
+    integration_platforms:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    platform_allow:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
