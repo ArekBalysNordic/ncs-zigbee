@@ -30,21 +30,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4
 
-      - name: Download site state from cleanup
-        id: download-cleanup
-        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
-        with:
-          workflow: docremove.yml
-          name: site-state
-          path: _existing_pages
-          workflow_conclusion: success
-          search_artifacts: true
-          if_no_artifact_found: warn
-        continue-on-error: true
-
       - name: Download site state from deploy
         id: download-deploy
-        if: steps.download-cleanup.outcome == 'failure'
         uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
         with:
           workflow: docpreview.yml
@@ -53,16 +40,14 @@ jobs:
           workflow_conclusion: success
           search_artifacts: true
           if_no_artifact_found: warn
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Remove symlinks from downloaded artifacts
-        if: steps.download-cleanup.outcome == 'success' || steps.download-deploy.outcome == 'success'
         run: |
           find _existing_pages -type l -delete 2>/dev/null || true
 
       - name: Cleanup site state
         id: download-site-state
-        if: steps.download-cleanup.outcome == 'success' || steps.download-deploy.outcome == 'success'
         uses: ./.github/actions/cleanup-site
         with:
           site_dir: _existing_pages
@@ -131,7 +116,7 @@ jobs:
         with:
           name: site-state
           path: _site
-          retention-days: 14 # 2 weeks
+          retention-days: 7 # 1 week, every rebase updates the artifacts
           overwrite: true
 
       - name: Find existing comment
