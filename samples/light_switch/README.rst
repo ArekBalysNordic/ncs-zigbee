@@ -18,6 +18,8 @@ See :ref:`zigbee_light_switch_activating_variants` for details about how to enab
 Requirements
 ************
 
+TEST
+
 The sample supports the following development kits:
 
 .. include:: /includes/device_table_single_multi.txt
