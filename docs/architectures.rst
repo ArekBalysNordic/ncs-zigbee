@@ -16,6 +16,8 @@ The designs are described from the least to the most complex, that is from simpl
 System-on-Chip designs
 **********************
 
+TEST4
+
 The single-chip solution has a combined RFIC (the IEEE 802.15.4 in case of Zigbee) and processor.
 Both the Zigbee stack and the application layer run on the local processor.
 
