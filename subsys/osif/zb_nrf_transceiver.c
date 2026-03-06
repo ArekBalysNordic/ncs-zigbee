@@ -64,7 +64,12 @@ struct nrf5_data {
 
 static struct nrf5_data nrf5_data;
 
-static int nrf_802154_radio_init(void)
+void zigbee_nrf_802154_radio_init(void)
+{
+	(void) nrf_802154_radio_init();
+}
+
+int nrf_802154_radio_init(void)
 {
 	k_fifo_init(&nrf5_data.rx.fifo);
 	k_sem_init(&nrf5_data.rssi_wait, 0, 1);
@@ -366,7 +371,7 @@ zb_ret_t zb_trans_cca(void)
 
 /* nRF 802.15.4 driver callbacks - modern API with metadata structures */
 
-void nrf_802154_transmitted_raw(uint8_t *p_frame,
+void zigbee_nrf_802154_transmitted_raw(uint8_t *p_frame,
 				const nrf_802154_transmit_done_metadata_t *p_metadata)
 {
 	ARG_UNUSED(p_frame);
@@ -378,7 +383,7 @@ void nrf_802154_transmitted_raw(uint8_t *p_frame,
 	zigbee_event_notify(ZIGBEE_EVENT_TX_DONE);
 }
 
-void nrf_802154_transmit_failed(uint8_t *p_frame,
+void zigbee_nrf_802154_transmit_failed(uint8_t *p_frame,
 				nrf_802154_tx_error_t error,
 				const nrf_802154_transmit_done_metadata_t *p_metadata)
 {
@@ -406,12 +411,12 @@ void nrf_802154_transmit_failed(uint8_t *p_frame,
 	zigbee_event_notify(ZIGBEE_EVENT_TX_FAILED);
 }
 
-void nrf_802154_tx_ack_started(const uint8_t *p_data)
+void zigbee_nrf_802154_tx_ack_started(const uint8_t *p_data)
 {
 	nrf5_data.rx.last_frame_ack_fpb = p_data[FRAME_PENDING_OFFSET] & FRAME_PENDING_BIT;
 }
 
-void nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
+void zigbee_nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
 				       uint8_t lqi, uint64_t time)
 {
 	struct zboss_rx_frame *rx_frame_free_slot = NULL;
@@ -447,20 +452,20 @@ void nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
 	zigbee_event_notify(ZIGBEE_EVENT_RX_DONE);
 }
 
-void nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
+void zigbee_nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
 {
 	ARG_UNUSED(id);
 	ARG_UNUSED(error);
 	nrf5_data.rx.last_frame_ack_fpb = false;
 }
 
-void nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result)
+void zigbee_nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result)
 {
 	nrf5_data.energy_detection.value = p_result->ed_dbm;
 	k_sem_give(&nrf5_data.rssi_wait);
 }
 
-void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
+void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 {
 	ARG_UNUSED(error);
 	

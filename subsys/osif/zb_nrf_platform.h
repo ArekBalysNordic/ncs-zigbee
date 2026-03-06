@@ -11,6 +11,7 @@
 #ifndef ZB_NRF_PLATFORM_H__
 #define ZB_NRF_PLATFORM_H__
 
+#include <nrf_802154_types.h>
 #include <zboss_api.h>
 #include <zephyr/kernel.h>
 
@@ -103,5 +104,24 @@ zb_bool_t zigbee_is_nvram_initialised(void);
  * @return    The newly set PAN_ID value.
  */
 uint32_t zigbee_pibcache_pan_id_clear(void);
+
+/**@brief nRF 802.15.4 radio driver callbacks (Zigbee OSIF implementation).
+ *
+ * These functions are called by the nRF 802.15.4 driver / dispatcher.
+ * Declarations are provided here for use as client callbacks in the
+ * nrf_802154 callbacks dispatcher.
+ */
+void zigbee_nrf_802154_transmitted_raw(uint8_t *p_frame,
+				       const nrf_802154_transmit_done_metadata_t *p_metadata);
+void zigbee_nrf_802154_transmit_failed(uint8_t *p_frame,
+				       nrf_802154_tx_error_t error,
+				       const nrf_802154_transmit_done_metadata_t *p_metadata);
+void zigbee_nrf_802154_tx_ack_started(const uint8_t *p_data);
+void zigbee_nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
+					      uint8_t lqi, uint64_t time);
+void zigbee_nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id);
+void zigbee_nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result);
+void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error);
+void zigbee_nrf_802154_radio_init(void);
 
 #endif /* ZB_NRF_PLATFORM_H__ */
