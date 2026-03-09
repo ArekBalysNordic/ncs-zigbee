@@ -5,10 +5,14 @@ manifest:
   remotes:
     - name: ncs
       url-base: https://github.com/nrfconnect
+    - name: kkasperczyk
+      url-base: https://github.com/kkasperczyk-no
+    - name: ArekBalysNordic
+      url-base: https://github.com/ArekBalysNordic
 
   projects:
     - name: nrf
-      remote: ncs
+      remote: ArekBalysNordic
       repo-path: sdk-nrf
-      revision: v3.2.0
+      revision: rd_callbacks_deduplication
       import: true

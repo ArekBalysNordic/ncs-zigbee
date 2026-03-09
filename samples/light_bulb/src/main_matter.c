@@ -32,8 +32,6 @@
 #endif
 
 #include <nrf_802154_callbacks_dispatcher.h>
-#include <radio_nrf5.h>
-#include <zb_nrf_platform.h>
 
 
 #define RUN_STATUS_LED                  DK_LED1
@@ -184,37 +182,6 @@ ZB_DECLARE_DIMMABLE_LIGHT_EP(
 ZBOSS_DECLARE_DEVICE_CTX_1_EP(
 	dimmable_light_ctx,
 	dimmable_light_ep);
-
-static uint32_t zigbee_802154_client_index;
-static uint32_t openthread_802154_client_index;
-	
-static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
-		.init = zigbee_nrf_802154_radio_init,
-		.received_timestamp_raw = zigbee_nrf_802154_received_timestamp_raw,
-		.receive_failed = zigbee_nrf_802154_receive_failed,
-		.tx_ack_started = zigbee_nrf_802154_tx_ack_started,
-		.transmitted_raw = zigbee_nrf_802154_transmitted_raw,
-		.transmit_failed = zigbee_nrf_802154_transmit_failed,
-		.energy_detected = zigbee_nrf_802154_energy_detected,
-		.energy_detection_failed = zigbee_nrf_802154_energy_detection_failed,
-	#if defined(CONFIG_NRF_802154_SER_HOST)
-		.serialization_error = NULL,
-	#endif
-};
-	
-static const struct nrf_802154_callbacks openthread_802154_callbacks = {
-		.init = openthread_nrf_802154_radio_init,
-		.received_timestamp_raw = openthread_nrf_802154_received_timestamp_raw,
-		.receive_failed = openthread_nrf_802154_receive_failed,
-		.tx_ack_started = openthread_nrf_802154_tx_ack_started,
-		.transmitted_raw = openthread_nrf_802154_transmitted_raw,
-		.transmit_failed = openthread_nrf_802154_transmit_failed,
-		.energy_detected = openthread_nrf_802154_energy_detected,
-		.energy_detection_failed = openthread_nrf_802154_energy_detection_failed,
-#if defined(CONFIG_NRF_802154_SER_HOST)
-		.serialization_error = openthread_nrf_802154_serialization_error,
-#endif
-};
 
 /**@brief Starts identifying the device.
  *
@@ -569,34 +536,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	}
 }
 
-/**
- * @brief Register Zigbee and OpenThread clients with the nRF 802.15.4 callbacks
- * dispatcher.
- *
- * Call once during application init. Activates the Zigbee client by default.
- */
- static int register_802154_dispatcher_clients(void) {
-	int ret;
-  
-	ret = nrf_802154_callbacks_dispatcher_register(&zigbee_802154_callbacks,
-												   &zigbee_802154_client_index);
-	if (ret != 0) {
-	  return ret;
-	}
-
-	ret = nrf_802154_callbacks_dispatcher_register(
-		&openthread_802154_callbacks, &openthread_802154_client_index);
-
-	if (ret != 0) {
-	  return ret;
-	}
-
-	ret =
-		nrf_802154_callbacks_dispatcher_activate(zigbee_802154_client_index);
-
-	return ret;
-  }
-
 int main(void)
 {
 	int blink_status = 0;
@@ -615,13 +554,10 @@ int main(void)
 
 	register_factory_reset_button(FACTORY_RESET_BUTTON);
 
-	/* Register both Zigbee and OpenThread with the 802.15.4 dispatcher; Zigbee is
-	 * active by default. */
-	err = register_802154_dispatcher_clients();
-
-	if (err != 0) {
-	  LOG_ERR("Failed to register 802.15.4 dispatcher clients: %d", err);
-	  return err;
+	int ret = nrf_802154_callbacks_dispatcher_activate("zigbee_nrf_802154_radio");
+	if (ret != 0) {
+	  LOG_ERR("Failed to activate Zigbee 802.15.4 radio: %d", ret);
+	  return ret;
 	}
 
 #ifdef CONFIG_CHIP

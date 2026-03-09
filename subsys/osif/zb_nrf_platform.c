@@ -93,8 +93,10 @@ typedef struct {
 
 LOG_MODULE_REGISTER(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
 
+#ifdef CONFIG_ZIGBEE_INIT_AT_BOOT
 BUILD_ASSERT(CONFIG_ZBOSS_INIT_PRIORITY > CONFIG_ZBOSS_RADIO_INIT_PRIORITY,
 	     "ZBOSS init priority must be greater than radio init priority");
+#endif /* CONFIG_ZIGBEE_INIT_AT_BOOT */
 
 /* Signal object to indicate that frame has been received */
 static struct k_poll_signal zigbee_sig = K_POLL_SIGNAL_INITIALIZER(zigbee_sig);
@@ -372,7 +374,11 @@ int zigbee_init(void)
 	return 0;
 }
 
+#ifdef CONFIG_ZIGBEE_INIT_AT_BOOT
+
 SYS_INIT(zigbee_init, POST_KERNEL, CONFIG_ZBOSS_INIT_PRIORITY);
+
+#endif /* CONFIG_ZIGBEE_INIT_AT_BOOT */
 
 #if IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
 void zb_ncp_app_fw_custom_post_start(void)

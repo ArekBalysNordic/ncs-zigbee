@@ -401,6 +401,12 @@ config ZIGBEE_TIME_KTIMER
 
 endchoice
 
+config ZIGBEE_INIT_AT_BOOT
+	bool "Initialize the ZBOSS stack at boot"
+	default y
+	help
+	  Initialize the ZBOSS stack at boot.
+
 config ZBOSS_RADIO_INIT_PRIORITY
 	int "nRF 802.15.4 radio driver initialization priority"
 	default 80
@@ -411,6 +417,7 @@ config ZBOSS_RADIO_INIT_PRIORITY
 
 config ZBOSS_INIT_PRIORITY
 	int "ZBOSS stack initialization priority"
+	depends on ZIGBEE_INIT_AT_BOOT
 	default 90
 	range 1 99
 	help
