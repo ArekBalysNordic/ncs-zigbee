@@ -15,9 +15,10 @@
 #include <soc.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/logging/log.h>
-#include <dk_buttons_and_leds.h>
 #include <zephyr/settings/settings.h>
 
+extern "C" {
+#include <dk_buttons_and_leds.h>
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
 #include <zb_mem_config_med.h>
@@ -26,12 +27,12 @@
 #include <zigbee/zigbee_zcl_scenes.h>
 #include <zb_nrf_platform.h>
 #include "zb_dimmable_light.h"
+#include <nrf_802154_callbacks_dispatcher.h>
+}
 
 #ifdef CONFIG_CHIP
-#include "matter_init.h"
+#include "app_task.h"
 #endif
-
-#include <nrf_802154_callbacks_dispatcher.h>
 
 
 #define RUN_STATUS_LED                  DK_LED1
@@ -306,7 +307,7 @@ static void level_control_set_value(zb_uint16_t new_level)
 
 #ifdef CONFIG_CHIP
 	/* Synchronize with Matter */
-	matter_update_level((uint8_t)new_level);
+	// matter_update_level((uint8_t)new_level);
 #endif
 }
 
@@ -334,7 +335,7 @@ static void on_off_set_value(zb_bool_t on)
 
 #ifdef CONFIG_CHIP
 	/* Synchronize with Matter */
-	matter_update_onoff((bool)on);
+	// matter_update_onoff((bool)on);
 #endif
 }
 
@@ -538,69 +539,63 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 int main(void)
 {
-	int blink_status = 0;
 	int err;
 
 	LOG_INF("Starting Zigbee + Matter Light Bulb example");
 
-	/* Initialize GPIO for buttons and LEDs */
-	configure_gpio();
+	// /* Initialize GPIO for buttons and LEDs */
+	// configure_gpio();
 
-	/* Initialize settings subsystem */
-	err = settings_subsys_init();
-	if (err) {
-		LOG_ERR("settings initialization failed");
-	}
+	// /* Initialize settings subsystem */
+	// err = settings_subsys_init();
+	// if (err) {
+	// 	LOG_ERR("settings initialization failed");
+	// }
 
-	register_factory_reset_button(FACTORY_RESET_BUTTON);
+	// register_factory_reset_button(FACTORY_RESET_BUTTON);
 
-	int ret = nrf_802154_callbacks_dispatcher_activate("zigbee_nrf_802154_radio");
-	if (ret != 0) {
-	  LOG_ERR("Failed to activate Zigbee 802.15.4 radio: %d", ret);
-	  return ret;
-	}
-
-#ifdef CONFIG_CHIP
-	/* Initialize Matter stack */
-	err = matter_init();
-	if (err) {
-		LOG_ERR("Matter initialization failed (err: %d)", err);
-		/* Continue with Zigbee only */
-	} else {
-		LOG_INF("Matter stack initialized");
+#ifdef CONFIG_NRF_802154_CALLBACKS_DISPATCHER
+	err = nrf_802154_callbacks_dispatcher_activate("openthread_nrf_802154_radio");
+	if (err != 0) {
+	  LOG_ERR("Failed to activate Zigbee 802.15.4 radio: %d", err);
+	  return err;
 	}
 #endif
 
-	/* Register callback for handling ZCL commands. */
-	ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
+	// /* Register callback for handling ZCL commands. */
+	// ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
 
-	/* Register dimmer switch device context (endpoints). */
-	ZB_AF_REGISTER_DEVICE_CTX(&dimmable_light_ctx);
+	// /* Register dimmer switch device context (endpoints). */
+	// ZB_AF_REGISTER_DEVICE_CTX(&dimmable_light_ctx);
 
-	bulb_clusters_attr_init();
-	level_control_set_value(dev_ctx.level_control_attr.current_level);
+	// bulb_clusters_attr_init();
+	// level_control_set_value(dev_ctx.level_control_attr.current_level);
 
-	/* Register handler to identify notifications. */
-	ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(DIMMABLE_LIGHT_ENDPOINT, identify_cb);
+	// /* Register handler to identify notifications. */
+	// ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(DIMMABLE_LIGHT_ENDPOINT, identify_cb);
 
-	/* Initialize ZCL scene table */
-	zcl_scenes_init();
+	// /* Initialize ZCL scene table */
+	// zcl_scenes_init();
 
-	/* Settings should be loaded after zcl_scenes_init */
-	err = settings_load();
-	if (err) {
-		LOG_ERR("settings loading failed");
-	}
+	// /* Settings should be loaded after zcl_scenes_init */
+	// err = settings_load();
+	// if (err) {
+	// 	LOG_ERR("settings loading failed");
+	// }
 
 	/* Start Zigbee default thread */
-	zigbee_enable();
-
-	zigbee_debug_suspend_zboss_thread();
+	// zigbee_enable();
 
 	LOG_INF("Zigbee + Matter Light Bulb example started");
 
-	while (1) {
-		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+#ifdef CONFIG_CHIP
+	/* Initialize Matter stack */
+	CHIP_ERROR ret = AppTask::Instance().StartApp();
+	if (ret != CHIP_NO_ERROR) {
+		LOG_ERR("Matter initialization failed");
+		return ret == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
+#endif
+
+	return 0;
 }

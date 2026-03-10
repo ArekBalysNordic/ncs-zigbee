@@ -407,6 +407,13 @@ config ZIGBEE_INIT_AT_BOOT
 	help
 	  Initialize the ZBOSS stack at boot.
 
+config ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER
+	bool "Automatically register the ZBOSS radio driver"
+	default y
+    depends on NRF_802154_CALLBACKS_DISPATCHER
+	help
+	  Automatically register the ZBOSS radio driver with the nRF 802.15.4 callbacks dispatcher.
+
 config ZBOSS_RADIO_INIT_PRIORITY
 	int "nRF 802.15.4 radio driver initialization priority"
 	default 80

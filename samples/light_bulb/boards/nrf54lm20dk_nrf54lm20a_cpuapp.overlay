@@ -6,7 +6,12 @@
 
 / {
 	chosen {
-		ncs,zigbee-timer = &timer24;
+		ncs,zigbee-timer = &timer23;
+	};
+
+	aliases {
+		/* Configure PWM module for led1 (LED2 on the board) */
+		pwm-led1 = &pwm_led3;
 	};
 
 	pwmleds {
@@ -48,6 +53,6 @@
 	};
 };
 
-&timer24 {
+&timer23 {
 	status = "okay";
 };
