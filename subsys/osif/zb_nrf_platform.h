@@ -45,6 +45,8 @@ bool zigbee_debug_zboss_thread_is_created(void);
 /**@brief Function for suspending the ZBOSS thread. */
 void zigbee_debug_suspend_zboss_thread(void);
 
+void zigbee_debug_stop_zboss_thread(void);
+
 /**@brief Function for resuming the ZBOSS thread. */
 void zigbee_debug_resume_zboss_thread(void);
 

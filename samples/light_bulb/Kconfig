@@ -17,6 +17,9 @@ endchoice
 
 endif # OPENTHREAD
 
+config MPSL_THREAD_COOP_PRIO
+	default 8
+
 if CHIP
 source "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/nrfconnect/chip-module/Kconfig.features"
 source "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/nrfconnect/chip-module/Kconfig.defaults"

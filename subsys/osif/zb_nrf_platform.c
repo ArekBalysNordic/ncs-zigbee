@@ -149,6 +149,16 @@ void zigbee_debug_suspend_zboss_thread(void)
 	k_thread_suspend(zboss_tid);
 }
 
+
+void zigbee_debug_stop_zboss_thread(void)
+{
+	if (zboss_tid) {
+		k_thread_abort(zboss_tid);
+		zboss_tid = NULL;
+		stack_is_started = false;
+	}
+}
+
 /**@brief Function for resuming ZBOSS thread.
  */
 void zigbee_debug_resume_zboss_thread(void)

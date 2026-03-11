@@ -563,7 +563,7 @@
      }
  
      /* Start Zigbee default thread */
-    //  zigbee_enable();
+     zigbee_enable();
  
      LOG_INF("Zigbee R23 Light Bulb example started");
  
