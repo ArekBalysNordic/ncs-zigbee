@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
+#include <string.h>
 #include <nrf_802154.h>
 #include <nrf_802154_const.h>
 #include <nrf_802154_types.h>
@@ -65,16 +66,46 @@ struct nrf5_data {
 
 static struct nrf5_data nrf5_data;
 
-void zigbee_nrf_802154_radio_init(void)
+static void zigbee_nrf_802154_release_rx_frames(void)
 {
+	for (size_t i = 0; i < ARRAY_SIZE(nrf5_data.rx.frames); i++) {
+		if (nrf5_data.rx.frames[i].psdu != NULL) {
+			nrf_802154_buffer_free_raw(nrf5_data.rx.frames[i].psdu);
+			nrf5_data.rx.frames[i].psdu = NULL;
+		}
+	}
+}
+
+static void zigbee_nrf_802154_radio_client_init(void)
+{
+	memset(&nrf5_data, 0, sizeof(nrf5_data));
 	k_fifo_init(&nrf5_data.rx.fifo);
 	k_sem_init(&nrf5_data.rssi_wait, 0, 1);
-	
-	nrf_802154_init();
-	
 	nrf5_data.state = ZB_RADIO_STATE_SLEEP;
 
 	LOG_INF("Zigbee radio initialized");
+}
+
+static void zigbee_nrf_802154_radio_client_deinit(void)
+{
+	(void)nrf_802154_transmit_at_cancel();
+	zigbee_nrf_802154_release_rx_frames();
+	nrf5_data.state = ZB_RADIO_STATE_SLEEP;
+	nrf5_data.rx.last_frame_ack_fpb = false;
+	nrf5_data.tx.psdu = NULL;
+	nrf5_data.energy_detection.value = INT8_MAX;
+}
+
+void zigbee_nrf_802154_radio_init(void)
+{
+	zigbee_nrf_802154_radio_client_init();
+	nrf_802154_init();
+}
+
+void zigbee_nrf_802154_radio_deinit(void)
+{
+	zigbee_nrf_802154_radio_client_deinit();
+	nrf_802154_deinit();
 }
 
 int zigbee_802154_radio_init(void)
@@ -476,9 +507,9 @@ void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 	}
 }
 #ifdef CONFIG_NRF_802154_CALLBACKS_DISPATCHER
-#ifdef CONFIG_ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER
 static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
-	.init = zigbee_nrf_802154_radio_init,
+	.init = zigbee_nrf_802154_radio_client_init,
+	.deinit = zigbee_nrf_802154_radio_client_deinit,
 	.received_timestamp_raw = zigbee_nrf_802154_received_timestamp_raw,
 	.receive_failed = zigbee_nrf_802154_receive_failed,
 	.tx_ack_started = zigbee_nrf_802154_tx_ack_started,
@@ -492,7 +523,6 @@ static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
 };
 
 NRF_802154_CALLBACKS_DISPATCHER_REGISTER(zigbee_nrf_802154_radio, zigbee_802154_callbacks);
-#endif /* CONFIG_ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER */
 
 #else
 /* Translate the nrf_802154 callbacks to zigbee_nrf_802154_callbacks for backward compatibility */
@@ -540,4 +570,4 @@ void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
 #endif
 
 SYS_INIT(zigbee_802154_radio_init, POST_KERNEL, CONFIG_ZBOSS_RADIO_INIT_PRIORITY);
-#endif /* CONFIG_ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER */
+#endif /* CONFIG_NRF_802154_CALLBACKS_DISPATCHER */

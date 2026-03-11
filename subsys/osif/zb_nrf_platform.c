@@ -34,6 +34,10 @@
 #define SYS_REBOOT_NCP 0x10
 #endif /* CONFIG_ZIGBEE_LIBRARY_NCP_DEV */
 
+#if defined(CONFIG_NRF_802154_CALLBACKS_DISPATCHER)
+#include <nrf_802154_callbacks_dispatcher.h>
+#endif
+
 /* Value that is returned while reading a single byte from the erased flash page .*/
 #define FLASH_EMPTY_BYTE 0xFF
 /* Broadcast Pan ID value */
