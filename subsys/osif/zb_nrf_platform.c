@@ -34,10 +34,6 @@
 #define SYS_REBOOT_NCP 0x10
 #endif /* CONFIG_ZIGBEE_LIBRARY_NCP_DEV */
 
-#if defined(CONFIG_NRF_802154_CALLBACKS_DISPATCHER)
-#include <nrf_802154_callbacks_dispatcher.h>
-#endif
-
 /* Value that is returned while reading a single byte from the erased flash page .*/
 #define FLASH_EMPTY_BYTE 0xFF
 /* Broadcast Pan ID value */
@@ -135,6 +131,20 @@ static struct k_thread zboss_thread_data;
 static k_tid_t zboss_tid;
 static bool stack_is_started;
 
+void zigbee_deinit(void)
+{
+	if (zboss_tid) {
+		k_thread_abort(zboss_tid);
+		zboss_tid = NULL;
+	}
+
+	stack_is_started = false;
+	(void)k_work_cancel(&zb_app_cb_work);
+	k_msgq_purge(&zb_app_cb_msgq);
+	k_poll_signal_reset(&zigbee_sig);
+	(void)atomic_clear((atomic_t *)&zb_app_cb_process_scheduled);
+}
+
 #ifdef CONFIG_ZIGBEE_DEBUG_FUNCTIONS
 /**@brief Function for checking if the ZBOSS thread has been created.
  */
@@ -151,16 +161,6 @@ bool zigbee_debug_zboss_thread_is_created(void)
 void zigbee_debug_suspend_zboss_thread(void)
 {
 	k_thread_suspend(zboss_tid);
-}
-
-
-void zigbee_debug_stop_zboss_thread(void)
-{
-	if (zboss_tid) {
-		k_thread_abort(zboss_tid);
-		zboss_tid = NULL;
-		stack_is_started = false;
-	}
 }
 
 /**@brief Function for resuming ZBOSS thread.

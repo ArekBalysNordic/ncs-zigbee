@@ -24,6 +24,9 @@
 
 LOG_MODULE_DECLARE(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
 
+// #define TRACE_ENTRY() LOG_INF("%s", __func__)
+#define TRACE_ENTRY() do { } while (0)
+
 enum zb_radio_state {
 	ZB_RADIO_STATE_SLEEP,
 	ZB_RADIO_STATE_RECEIVE,
@@ -68,6 +71,8 @@ static struct nrf5_data nrf5_data;
 
 static void zigbee_nrf_802154_release_rx_frames(void)
 {
+	TRACE_ENTRY();
+
 	for (size_t i = 0; i < ARRAY_SIZE(nrf5_data.rx.frames); i++) {
 		if (nrf5_data.rx.frames[i].psdu != NULL) {
 			nrf_802154_buffer_free_raw(nrf5_data.rx.frames[i].psdu);
@@ -76,8 +81,27 @@ static void zigbee_nrf_802154_release_rx_frames(void)
 	}
 }
 
-static void zigbee_nrf_802154_radio_client_init(void)
+void zigbee_nrf_802154_radio_deinit(void)
 {
+	TRACE_ENTRY();
+
+	(void)nrf_802154_sleep();
+	(void)nrf_802154_transmit_at_cancel();
+	nrf_802154_promiscuous_set(false);
+	nrf_802154_pan_coord_set(false);
+	nrf_802154_auto_ack_set(false);
+	nrf_802154_auto_pending_bit_set(true);
+	nrf_802154_pending_bit_for_addr_reset(false);
+	nrf_802154_pending_bit_for_addr_reset(true);
+	nrf_802154_tx_power_set(0);
+
+	zigbee_nrf_802154_release_rx_frames();
+}
+
+void zigbee_nrf_802154_radio_init(void)
+{
+	TRACE_ENTRY();
+
 	memset(&nrf5_data, 0, sizeof(nrf5_data));
 	k_fifo_init(&nrf5_data.rx.fifo);
 	k_sem_init(&nrf5_data.rssi_wait, 0, 1);
@@ -86,36 +110,10 @@ static void zigbee_nrf_802154_radio_client_init(void)
 	LOG_INF("Zigbee radio initialized");
 }
 
-static void zigbee_nrf_802154_radio_client_deinit(void)
-{
-	(void)nrf_802154_transmit_at_cancel();
-	zigbee_nrf_802154_release_rx_frames();
-	nrf5_data.state = ZB_RADIO_STATE_SLEEP;
-	nrf5_data.rx.last_frame_ack_fpb = false;
-	nrf5_data.tx.psdu = NULL;
-	nrf5_data.energy_detection.value = INT8_MAX;
-}
-
-void zigbee_nrf_802154_radio_init(void)
-{
-	zigbee_nrf_802154_radio_client_init();
-	nrf_802154_init();
-}
-
-void zigbee_nrf_802154_radio_deinit(void)
-{
-	zigbee_nrf_802154_radio_client_deinit();
-	nrf_802154_deinit();
-}
-
-int zigbee_802154_radio_init(void)
-{
-	zigbee_nrf_802154_radio_init();
-	return 0;
-}
-
 void zb_trans_hw_init(void)
 {
+	TRACE_ENTRY();
+
 	LOG_INF(">>> zb_trans_hw_init() - configuring driver PIBs from ZBOSS thread");
 	
 	nrf_802154_auto_ack_set(true);
@@ -126,24 +124,32 @@ void zb_trans_hw_init(void)
 
 void zb_trans_set_pan_id(zb_uint16_t pan_id)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: 0x%x", __func__, pan_id);
 	nrf_802154_pan_id_set((zb_uint8_t *)(&pan_id));
 }
 
 void zb_trans_set_long_addr(zb_ieee_addr_t long_addr)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: 0x%llx", __func__, (uint64_t)*long_addr);
 	nrf_802154_extended_address_set(long_addr);
 }
 
 void zb_trans_set_short_addr(zb_uint16_t addr)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: 0x%x", __func__, addr);
 	nrf_802154_short_address_set((uint8_t *)(&addr));
 }
 
 static int zboss_energy_detection_start(uint32_t time_us)
 {
+	TRACE_ENTRY();
+
 	nrf5_data.energy_detection.time_us = time_us;
 	
 	if (!nrf_802154_energy_detection(time_us)) {
@@ -158,6 +164,7 @@ void zb_trans_start_get_rssi(zb_uint8_t scan_duration_bi)
 	int err;
 	uint32_t time_us = ZB_TIME_BEACON_INTERVAL_TO_USEC(scan_duration_bi);
 
+	TRACE_ENTRY();
 	LOG_DBG("%s: %d us", __func__, time_us);
 
 	err = zboss_energy_detection_start(time_us);
@@ -171,6 +178,8 @@ void zb_trans_start_get_rssi(zb_uint8_t scan_duration_bi)
 
 void zb_trans_get_rssi(zb_uint8_t *rssi_value_p)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s", __func__);
 
 	/* Blocking implementation: wait for energy detection to complete.
@@ -184,6 +193,8 @@ void zb_trans_get_rssi(zb_uint8_t *rssi_value_p)
 
 zb_ret_t zb_trans_set_channel(zb_uint8_t channel_number)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: %d", __func__, channel_number);
 	nrf_802154_channel_set(channel_number);
 	return RET_OK;
@@ -191,36 +202,48 @@ zb_ret_t zb_trans_set_channel(zb_uint8_t channel_number)
 
 void zb_trans_set_tx_power(zb_int8_t power)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: %d", __func__, power);
 	nrf_802154_tx_power_set(power);
 }
 
 void zb_trans_get_tx_power(zb_int8_t *power)
 {
+	TRACE_ENTRY();
+
 	*power = (zb_int8_t)nrf_802154_tx_power_get();
 	LOG_DBG("%s: %d", __func__, *power);
 }
 
 void zb_trans_set_pan_coord(zb_bool_t enabled)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: %d", __func__, enabled);
 	nrf_802154_pan_coord_set((bool)enabled);
 }
 
 void zb_trans_set_auto_ack(zb_bool_t enabled)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: %d", __func__, enabled);
 	nrf_802154_auto_ack_set((bool)enabled);
 }
 
 void zb_trans_set_promiscuous_mode(zb_bool_t enabled)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: %d", __func__, enabled);
 	nrf_802154_promiscuous_set((bool)enabled);
 }
 
 void zb_trans_enter_receive(void)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s", __func__);
 	(void)nrf_802154_receive();
 	nrf5_data.state = ZB_RADIO_STATE_RECEIVE;
@@ -228,6 +251,8 @@ void zb_trans_enter_receive(void)
 
 void zb_trans_enter_sleep(void)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s", __func__);
 	(void)nrf_802154_sleep_if_idle();
 	nrf5_data.state = ZB_RADIO_STATE_SLEEP;
@@ -236,6 +261,8 @@ void zb_trans_enter_sleep(void)
 zb_bool_t zb_trans_is_receiving(void)
 {
 	zb_bool_t is_receiv = (nrf5_data.state == ZB_RADIO_STATE_RECEIVE) ? ZB_TRUE : ZB_FALSE;
+
+	TRACE_ENTRY();
 	LOG_DBG("%s: %d", __func__, is_receiv);
 	return is_receiv;
 }
@@ -243,6 +270,8 @@ zb_bool_t zb_trans_is_receiving(void)
 zb_bool_t zb_trans_is_active(void)
 {
 	zb_bool_t is_active = (nrf5_data.state != ZB_RADIO_STATE_SLEEP) ? ZB_TRUE : ZB_FALSE;
+
+	TRACE_ENTRY();
 	LOG_DBG("%s: %d", __func__, is_active);
 	return is_active;
 }
@@ -250,6 +279,8 @@ zb_bool_t zb_trans_is_active(void)
 zb_bool_t zb_trans_transmit(zb_uint8_t wait_type, zb_time_t tx_at,
 			    zb_uint8_t *tx_buf, zb_uint8_t current_channel)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: channel %d", __func__, current_channel);
 	nrf_802154_tx_error_t result;
 	nrf_802154_capabilities_t caps = nrf_802154_capabilities_get();
@@ -326,12 +357,16 @@ zb_bool_t zb_trans_transmit(zb_uint8_t wait_type, zb_time_t tx_at,
 
 void zb_trans_buffer_free(zb_uint8_t *buf)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s", __func__);
 	nrf_802154_buffer_free_raw(buf);
 }
 
 zb_bool_t zb_trans_set_pending_bit(zb_uint8_t *addr, zb_bool_t value, zb_bool_t extended)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s: value=%d", __func__, value);
 
 	if (!value) {
@@ -345,13 +380,16 @@ zb_bool_t zb_trans_set_pending_bit(zb_uint8_t *addr, zb_bool_t value, zb_bool_t 
 
 void zb_trans_src_match_tbl_drop(void)
 {
-	LOG_DBG("%s", __func__);
+	TRACE_ENTRY();
+
 	nrf_802154_pending_bit_for_addr_reset(false);
 	nrf_802154_pending_bit_for_addr_reset(true);
 }
 
 zb_time_t osif_sub_trans_timer(zb_time_t t2, zb_time_t t1)
 {
+	TRACE_ENTRY();
+
 	return ZB_TIME_SUBTRACT(t2, t1);
 }
 
@@ -362,6 +400,8 @@ zb_bool_t zb_trans_rx_pending(void)
 
 zb_uint8_t zb_trans_get_next_packet(zb_bufid_t buf)
 {
+	TRACE_ENTRY();
+
 	LOG_DBG("%s", __func__);
 	zb_uint8_t *data_ptr;
 	zb_uint8_t length = 0;
@@ -394,6 +434,8 @@ zb_uint8_t zb_trans_get_next_packet(zb_bufid_t buf)
 
 zb_ret_t zb_trans_cca(void)
 {
+	TRACE_ENTRY();
+
 	bool cca_result = nrf_802154_cca();
 	return cca_result ? RET_OK : RET_BUSY;
 }
@@ -403,6 +445,8 @@ zb_ret_t zb_trans_cca(void)
 void zigbee_nrf_802154_transmitted_raw(uint8_t *p_frame,
 				const nrf_802154_transmit_done_metadata_t *p_metadata)
 {
+	TRACE_ENTRY();
+
 	ARG_UNUSED(p_frame);
 
 	uint8_t *ack = p_metadata->data.transmitted.p_ack;
@@ -416,6 +460,8 @@ void zigbee_nrf_802154_transmit_failed(uint8_t *p_frame,
 				nrf_802154_tx_error_t error,
 				const nrf_802154_transmit_done_metadata_t *p_metadata)
 {
+	TRACE_ENTRY();
+
 	ARG_UNUSED(p_frame);
 	ARG_UNUSED(p_metadata);
 
@@ -442,6 +488,8 @@ void zigbee_nrf_802154_transmit_failed(uint8_t *p_frame,
 
 void zigbee_nrf_802154_tx_ack_started(const uint8_t *p_data)
 {
+	TRACE_ENTRY();
+
 	nrf5_data.rx.last_frame_ack_fpb = p_data[FRAME_PENDING_OFFSET] & FRAME_PENDING_BIT;
 }
 
@@ -449,6 +497,8 @@ void zigbee_nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
 				       uint8_t lqi, uint64_t time)
 {
 	struct zboss_rx_frame *rx_frame_free_slot = NULL;
+
+	TRACE_ENTRY();
 
 	for (uint32_t i = 0; i < ARRAY_SIZE(nrf5_data.rx.frames); i++) {
 		if (nrf5_data.rx.frames[i].psdu == NULL) {
@@ -483,6 +533,8 @@ void zigbee_nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
 
 void zigbee_nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
 {
+	TRACE_ENTRY();
+
 	ARG_UNUSED(id);
 	ARG_UNUSED(error);
 	nrf5_data.rx.last_frame_ack_fpb = false;
@@ -490,12 +542,16 @@ void zigbee_nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
 
 void zigbee_nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result)
 {
+	TRACE_ENTRY();
+
 	nrf5_data.energy_detection.value = p_result->ed_dbm;
 	k_sem_give(&nrf5_data.rssi_wait);
 }
 
 void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 {
+	TRACE_ENTRY();
+
 	ARG_UNUSED(error);
 	
 	int err = zboss_energy_detection_start(nrf5_data.energy_detection.time_us);
@@ -507,9 +563,10 @@ void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 	}
 }
 #ifdef CONFIG_NRF_802154_CALLBACKS_DISPATCHER
+#ifdef CONFIG_ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER
 static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
-	.init = zigbee_nrf_802154_radio_client_init,
-	.deinit = zigbee_nrf_802154_radio_client_deinit,
+	.init = zigbee_nrf_802154_radio_init,
+	.deinit = zigbee_nrf_802154_radio_deinit,
 	.received_timestamp_raw = zigbee_nrf_802154_received_timestamp_raw,
 	.receive_failed = zigbee_nrf_802154_receive_failed,
 	.tx_ack_started = zigbee_nrf_802154_tx_ack_started,
@@ -523,51 +580,76 @@ static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
 };
 
 NRF_802154_CALLBACKS_DISPATCHER_REGISTER(zigbee_nrf_802154_radio, zigbee_802154_callbacks);
-
+#endif /* CONFIG_ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER */
 #else
 /* Translate the nrf_802154 callbacks to zigbee_nrf_802154_callbacks for backward compatibility */
 void nrf_802154_received_timestamp_raw(uint8_t *data, int8_t power, uint8_t lqi, uint64_t time)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_received_timestamp_raw(data, power, lqi, time);
 }
 
 void nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_receive_failed(error, id);
 }
 
 void nrf_802154_tx_ack_started(const uint8_t *data)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_tx_ack_started(data);
 }
 
 void nrf_802154_transmitted_raw(uint8_t *frame, const nrf_802154_transmit_done_metadata_t *metadata)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_transmitted_raw(frame, metadata);
 }
 
 void nrf_802154_transmit_failed(uint8_t *frame, nrf_802154_tx_error_t error,
 				const nrf_802154_transmit_done_metadata_t *metadata)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_transmit_failed(frame, error, metadata);
 }
 
 void nrf_802154_energy_detected(const nrf_802154_energy_detected_t *result)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_energy_detected(result);
 }
 
 void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_energy_detection_failed(error);
 }
 
 #if defined(CONFIG_NRF_802154_SER_HOST)
 void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
 {
+	TRACE_ENTRY();
+
 	zigbee_nrf_802154_serialization_error(err);
 }
 #endif
+
+static int zigbee_802154_radio_init(void)
+{
+	TRACE_ENTRY();
+
+	zigbee_nrf_802154_radio_init();
+	nrf_802154_init();
+	return 0;
+}
 
 SYS_INIT(zigbee_802154_radio_init, POST_KERNEL, CONFIG_ZBOSS_RADIO_INIT_PRIORITY);
 #endif /* CONFIG_NRF_802154_CALLBACKS_DISPATCHER */

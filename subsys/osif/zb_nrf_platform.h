@@ -38,14 +38,15 @@ bool zigbee_is_stack_started(void);
 /**@brief Function for starting the Zigbee thread. */
 void zigbee_enable(void);
 
+/**@brief Function for deinitializing Zigbee OSIF resources after disable. */
+void zigbee_deinit(void);
+
 #ifdef CONFIG_ZIGBEE_DEBUG_FUNCTIONS
 /**@brief Function for checking if the ZBOSS thread has been created. */
 bool zigbee_debug_zboss_thread_is_created(void);
 
 /**@brief Function for suspending the ZBOSS thread. */
 void zigbee_debug_suspend_zboss_thread(void);
-
-void zigbee_debug_stop_zboss_thread(void);
 
 /**@brief Function for resuming the ZBOSS thread. */
 void zigbee_debug_resume_zboss_thread(void);
@@ -125,5 +126,6 @@ void zigbee_nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id);
 void zigbee_nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result);
 void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error);
 void zigbee_nrf_802154_radio_init(void);
+void zigbee_nrf_802154_radio_deinit(void);
 
 #endif /* ZB_NRF_PLATFORM_H__ */
