@@ -43,21 +43,22 @@ K_THREAD_DEFINE(zigbee_thread_id, ZIGBEE_THREAD_STACK_SIZE, zigbee_thread_fn,
 K_THREAD_DEFINE(matter_thread_id, MATTER_THREAD_STACK_SIZE, matter_thread_fn,
                 NULL, NULL, NULL, MATTER_THREAD_PRIORITY, 0, 0);
 
+void switch_to_thread_radio(void) {
+  k_thread_abort(zigbee_thread_id);
+  zigbee_deinit();
+  int ret = nrf_802154_callbacks_dispatcher_switch(
+      "openthread_nrf_802154_radio", true);
+  if (ret != 0) {
+    LOG_ERR("Failed to switch 802.15.4 radio to Thread: %d", ret);
+  }
+}
+
 void matter_zigbee_event_handler(
     const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg) {
   switch (event->Type) {
   case chip::DeviceLayer::DeviceEventType::kSecureSessionEstablished:
     /* Switch to Thread Radio and disable Zigbee Stack*/
-    {
-      k_thread_abort(zigbee_thread_id);
-      zigbee_deinit();
-      int ret = nrf_802154_callbacks_dispatcher_switch(
-          "openthread_nrf_802154_radio", true);
-      if (ret != 0) {
-        LOG_ERR("Failed to switch 802.15.4 radio to Thread: %d", ret);
-        break;
-      }
-    }
+    switch_to_thread_radio();
     break;
   case chip::DeviceLayer::DeviceEventType::kFactoryReset:
     /* Remove also the zigbee stack data */
@@ -78,6 +79,10 @@ int main(void) {
 
   k_thread_start(zigbee_thread_id);
   k_thread_start(matter_thread_id);
+
+  // Wait 2 seconds and switch to Thread radio
+  k_sleep(K_SECONDS(2));
+  switch_to_thread_radio();
 
 #else
 

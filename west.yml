@@ -5,8 +5,8 @@ manifest:
   remotes:
     - name: ncs
       url-base: https://github.com/nrfconnect
-    - name: kkasperczyk
-      url-base: https://github.com/kkasperczyk-no
+    - name: ncs_ssh
+      url-base: git@github.com:nrfconnect
     - name: ArekBalysNordic
       url-base: https://github.com/ArekBalysNordic
 
@@ -16,3 +16,8 @@ manifest:
       repo-path: sdk-nrf
       revision: rd_callbacks_deduplication
       import: true
+    - name: nrf-802154
+      remote: ncs_ssh
+      repo-path: sdk-nrf-802154
+      path: nrf-802154
+      revision: pull/719/head
