@@ -579,7 +579,7 @@ static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
 #endif
 };
 
-NRF_802154_CALLBACKS_DISPATCHER_REGISTER(zigbee_nrf_802154_radio, zigbee_802154_callbacks);
+NRF_802154_CALLBACKS_DISPATCHER_REGISTER(zigbee, zigbee_802154_callbacks);
 #endif /* CONFIG_ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER */
 #else
 /* Translate the nrf_802154 callbacks to zigbee_nrf_802154_callbacks for backward compatibility */
