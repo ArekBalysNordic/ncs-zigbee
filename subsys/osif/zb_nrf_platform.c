@@ -93,8 +93,10 @@ typedef struct {
 
 LOG_MODULE_REGISTER(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
 
+#ifdef CONFIG_ZIGBEE_INIT_AT_BOOT
 BUILD_ASSERT(CONFIG_ZBOSS_INIT_PRIORITY > CONFIG_ZBOSS_RADIO_INIT_PRIORITY,
 	     "ZBOSS init priority must be greater than radio init priority");
+#endif /* CONFIG_ZIGBEE_INIT_AT_BOOT */
 
 /* Signal object to indicate that frame has been received */
 static struct k_poll_signal zigbee_sig = K_POLL_SIGNAL_INITIALIZER(zigbee_sig);
@@ -128,6 +130,20 @@ K_THREAD_STACK_DEFINE(zboss_stack_area, CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE);
 static struct k_thread zboss_thread_data;
 static k_tid_t zboss_tid;
 static bool stack_is_started;
+
+void zigbee_deinit(void)
+{
+	if (zboss_tid) {
+		k_thread_abort(zboss_tid);
+		zboss_tid = NULL;
+	}
+
+	stack_is_started = false;
+	(void)k_work_cancel(&zb_app_cb_work);
+	k_msgq_purge(&zb_app_cb_msgq);
+	k_poll_signal_reset(&zigbee_sig);
+	(void)atomic_clear((atomic_t *)&zb_app_cb_process_scheduled);
+}
 
 #ifdef CONFIG_ZIGBEE_DEBUG_FUNCTIONS
 /**@brief Function for checking if the ZBOSS thread has been created.
@@ -372,7 +388,11 @@ int zigbee_init(void)
 	return 0;
 }
 
+#ifdef CONFIG_ZIGBEE_INIT_AT_BOOT
+
 SYS_INIT(zigbee_init, POST_KERNEL, CONFIG_ZBOSS_INIT_PRIORITY);
+
+#endif /* CONFIG_ZIGBEE_INIT_AT_BOOT */
 
 #if IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
 void zb_ncp_app_fw_custom_post_start(void)

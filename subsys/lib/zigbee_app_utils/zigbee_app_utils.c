@@ -282,6 +282,15 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		} else {
 			LOG_ERR("Failed to initialize Zigbee stack (status: %d)",
 				status);
+			/* For router/ED, try network steering anyway so the device
+			 * can attempt to join despite BDB init reporting an error.
+			 * Use LOG_WRN so this is visible when app utils log level is WRN or higher.
+			 */
+			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
+				LOG_WRN("Start network steering (recovery)");
+				start_network_rejoin();
+			}
+			/* Return RET_OK so ZB_ERROR_CHECK in the app does not abort. */
 		}
 		break;
 

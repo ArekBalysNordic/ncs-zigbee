@@ -114,6 +114,15 @@ config ZBOSS_DEFAULT_THREAD_STACK_SIZE
 	help
 	  Stack size of ZBOSS Zephyr task. This is the task zboss_main_loop_iteration is called from.
 
+config ZIGBEE_USE_ZBOSS_FULL_START
+	bool "Use zboss_start() instead of zboss_start_no_autostart()"
+	default n
+	help
+	  When set, the ZBOSS thread calls zboss_start() (full autostart) instead of
+	  zboss_start_no_autostart(). Use this workaround if the stack never delivers
+	  ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY / ZB_ZDO_SIGNAL_SKIP_STARTUP when
+	  using zboss_start_no_autostart() (e.g. in combined Zigbee + Matter builds).
+
 config ZIGBEE_APP_CB_QUEUE_LENGTH
 	int "Length of the application callback and alarm queue"
 	default 10
@@ -401,6 +410,19 @@ config ZIGBEE_TIME_KTIMER
 
 endchoice
 
+config ZIGBEE_INIT_AT_BOOT
+	bool "Initialize the ZBOSS stack at boot"
+	default y
+	help
+	  Initialize the ZBOSS stack at boot.
+
+config ZIGBEE_RADIO_DISPATCHER_AUTOREGISTER
+	bool "Automatically register the ZBOSS radio driver"
+	default y
+    depends on NRF_802154_CALLBACKS_DISPATCHER
+	help
+	  Automatically register the ZBOSS radio driver with the nRF 802.15.4 callbacks dispatcher.
+
 config ZBOSS_RADIO_INIT_PRIORITY
 	int "nRF 802.15.4 radio driver initialization priority"
 	default 80
@@ -411,6 +433,7 @@ config ZBOSS_RADIO_INIT_PRIORITY
 
 config ZBOSS_INIT_PRIORITY
 	int "ZBOSS stack initialization priority"
+	depends on ZIGBEE_INIT_AT_BOOT
 	default 90
 	range 1 99
 	help
