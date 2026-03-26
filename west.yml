@@ -7,12 +7,14 @@ manifest:
       url-base: https://github.com/nrfconnect
     - name: ncs_ssh
       url-base: git@github.com:nrfconnect
+    - name: ArekBalysNordic
+      url-base: https://github.com/ArekBalysNordic
 
   projects:
     - name: nrf
-      remote: ncs
+      remote: ArekBalysNordic
       repo-path: sdk-nrf
-      revision: pull/27711/head
+      revision: callbacks_dispatcher_v3_2_0
       import: true
     - name: nrf-802154
       remote: ncs_ssh
