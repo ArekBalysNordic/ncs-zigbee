@@ -5,10 +5,12 @@ manifest:
   remotes:
     - name: ncs
       url-base: https://github.com/nrfconnect
+    - name: ArekBalysNordic
+      url-base: https://github.com/ArekBalysNordic
 
   projects:
     - name: nrf
-      remote: ncs
+      remote: ArekBalysNordic
       repo-path: sdk-nrf
-      revision: v3.3.0-rc2
+      revision: pm_removal
       import: true

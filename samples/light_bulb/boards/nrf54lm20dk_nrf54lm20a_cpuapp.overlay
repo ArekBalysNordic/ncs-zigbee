@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf54lm20_matter_zigbee_combined_partitions.dtsi>
+
 / {
 	chosen {
 		ncs,zigbee-timer = &timer23;
@@ -23,12 +25,6 @@
 	};
 };
 
-&rram_controller {
-	cpuapp_rram: rram@0 {
-		reg = <0x0 DT_SIZE_K(2036)>;
-		ranges = <0x0 0x0 DT_SIZE_K(2036)>;
-	};
-};
 
 &pwm20 {
 	status = "okay";
