@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+
+&cpuapp_sram {
+	reg = <0x20000000 DT_SIZE_K(511)>;
+	ranges = <0x0 0x20000000 DT_SIZE_K(511)>;
+};
+
+&rram_controller {
+	cpuapp_rram: rram@0 {
+		reg = <0x0 DT_SIZE_K(2036)>;
+		ranges = <0x0 0x0 DT_SIZE_K(2036)>;
+	};
+};
+
+&cpuapp_rram {
+        partitions {
+                boot_partition: partition@0 {
+                        label = "mcuboot";
+                        reg = <0x0 0xa000>;
+                };
+
+                slot0_partition: partition@a000 {
+                        label = "image-0";
+                        reg = <0xa000 0x117000>;
+                };
+
+                slot1_partition: partition@121000 {
+                        label = "image-1";
+                        reg = <0x121000 0xc0000>;
+                };
+
+                nvs_storage: partition@1e1000 {
+                        label = "nvs-storage";
+                        reg = <0x1e1000 0x6000>;
+                };
+
+                zboss_nvram: partition@1e7000 {
+                        label = "zboss-nvram";
+                        reg = <0x1e7000 0x8000>;
+                };
+
+                zboss_product_config: partition@1ef000 {
+                        label = "zboss-product-config";
+                        reg = <0x1ef000 0x1000>;
+                };
+
+                factory_data_partition: partition@1f0000 {
+                        label = "factory-data";
+                        reg = <0x1f0000 0x1000>;
+                };
+
+                storage_partition: partition@1f1000 {
+                        label = "storage";
+                        reg = <0x1f1000 0xc000>;
+                };
+        };
+};
