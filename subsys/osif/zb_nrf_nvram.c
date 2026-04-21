@@ -4,16 +4,37 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <pm_config.h>
-#include <zephyr/storage/flash_map.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/storage/flash_map.h>
+
+#ifdef CONFIG_PARTITION_MANAGER_ENABLED
+#include <pm_config.h>
+#endif
 
 #include <zboss_api.h>
 
 #ifdef ZB_USE_NVRAM
 
+#ifdef CONFIG_PARTITION_MANAGER_ENABLED
+#define ZBOSS_NVRAM_PARTITION_SIZE PM_ZBOSS_NVRAM_SIZE
+#define ZBOSS_NVRAM_FLASH_AREA_ID  PM_ZBOSS_NVRAM_ID
+#define ZBOSS_PRODUCT_CONFIG_FLASH_AREA_ID PM_ZBOSS_PRODUCT_CONFIG_ID
+#else
+#define ZBOSS_NVRAM_PARTITION_SIZE	      FIXED_PARTITION_SIZE(zboss_nvram)
+#define ZBOSS_NVRAM_FLASH_AREA_ID	      FIXED_PARTITION_ID(zboss_nvram)
+#define ZBOSS_PRODUCT_CONFIG_FLASH_AREA_ID    FIXED_PARTITION_ID(zboss_product_config)
+
+BUILD_ASSERT(FIXED_PARTITION_EXISTS(zboss_nvram),
+	     "Devicetree must define fixed partition node zboss_nvram when Partition Manager is disabled.");
+#ifdef ZB_PRODUCTION_CONFIG
+BUILD_ASSERT(FIXED_PARTITION_EXISTS(zboss_product_config),
+	     "Devicetree must define fixed partition node zboss_product_config for production config "
+	     "when Partition Manager is disabled.");
+#endif
+#endif
+
 /* Size of logical ZBOSS NVRAM page in bytes. */
-#define ZBOSS_NVRAM_PAGE_SIZE (PM_ZBOSS_NVRAM_SIZE / CONFIG_ZIGBEE_NVRAM_PAGE_COUNT)
+#define ZBOSS_NVRAM_PAGE_SIZE (ZBOSS_NVRAM_PARTITION_SIZE / CONFIG_ZIGBEE_NVRAM_PAGE_COUNT)
 #define PHYSICAL_PAGE_SIZE 0x1000
 BUILD_ASSERT((ZBOSS_NVRAM_PAGE_SIZE % PHYSICAL_PAGE_SIZE) == 0,
 	     "The size must be a multiply of physical page size.");
@@ -36,13 +57,13 @@ void zb_osif_nvram_init(const zb_char_t *name)
 	ARG_UNUSED(name);
 	int ret;
 
-	ret = flash_area_open(PM_ZBOSS_NVRAM_ID, &fa);
+	ret = flash_area_open(ZBOSS_NVRAM_FLASH_AREA_ID, &fa);
 	if (ret) {
 		LOG_ERR("Can't open ZBOSS NVRAM flash area");
 	}
 
 #ifdef ZB_PRODUCTION_CONFIG
-	ret = flash_area_open(PM_ZBOSS_PRODUCT_CONFIG_ID, &fa_pc);
+	ret = flash_area_open(ZBOSS_PRODUCT_CONFIG_FLASH_AREA_ID, &fa_pc);
 	if (ret) {
 		LOG_ERR("Can't open product config flash area");
 	}
